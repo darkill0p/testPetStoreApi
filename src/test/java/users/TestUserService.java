@@ -1,9 +1,9 @@
 package users;
 
-
 import apiModels.UserSchema;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -12,13 +12,14 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-public class TestUserService {
 
+@Epic("Тестирование API endpoints для пользователей (Users)")
+public class TestUserService {
 
     UserSchema createdUser;
 
     @BeforeAll
-    static void init(){
+    static void init() {
         RestAssured.baseURI = "https://petstore.swagger.io/v2/user";
     }
 
@@ -33,27 +34,29 @@ public class TestUserService {
         }
     }
 
-
-
-
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРІРѕР°РЅРёРµ СѓСЃРїРµС€РЅРѕР№ СЂРµРіРёСЃС‚СЂР°С†РёРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testSuccessCreateUser(){
-        UserSchema user = new UserSchema(1, "dd1", "РЎРµСЂРіРµРµРІРёС‡", "РђРЅС‚РѕРЅРѕРІРёС‡", "ivanov@mail.ru", "12345678","899999999999", 1);
+    @DisplayName("Тестирование успешной регистрации пользователя")
+    @Description("Этот тест проверяет успешную регистрацию нового пользователя в системе")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Регистрация нового пользователя")
+    public void testSuccessCreateUser() {
+        UserSchema user = new UserSchema(1, "dd1", "Сергеевич", "Антонович", "ivanov@mail.ru", "12345678", "899999999999", 1);
         given().header("Content-Type", "application/json").header("Accept", "application/json")
                 .body(user)
                 .when().post()
                 .then().statusCode(200);
     }
 
-
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓСЃРїРµС€РЅРѕРіРѕ РїРѕР»СѓС‡РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testSuccessGetUser(){
+    @DisplayName("Тестирование успешного получения пользователя")
+    @Description("Этот тест проверяет успешное получение данных пользователя")
+    @Severity(SeverityLevel.CRITICAL)
+    @Story("Получение данных пользователя")
+    public void testSuccessGetUser() {
         int userId;
         Response response =
                 given().header("Content-Type", "application/json").pathParam("userName", createdUser.getUsername())
-                        .log().ifValidationFails() // Р›РѕРіРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРё РїСЂРѕРІР°Р»Рµ С‚РµСЃС‚Р°
+                        .log().ifValidationFails() // Логировать только при провале теста
                         .when().get("/{userName}")
                         .then()
                         .statusCode(200)
@@ -63,45 +66,59 @@ public class TestUserService {
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ  РїРѕР»СѓС‡РµРЅРёСЏ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testFailedGetUser(){
+    @DisplayName("Тестирование получения несуществующего пользователя")
+    @Description("Этот тест проверяет попытку получения несуществующего пользователя")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Получение несуществующего пользователя")
+    public void testFailedGetUser() {
         Response response =
                 given().header("Content-Type", "application/json").pathParam("userName", "notExist")
-                        .log().ifValidationFails() // Р›РѕРіРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРё РїСЂРѕРІР°Р»Рµ С‚РµСЃС‚Р°
+                        .log().ifValidationFails() // Логировать только при провале теста
                         .when().get("/{userName}")
                         .then()
                         .statusCode(404)
                         .extract().response();
-
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓСЃРїРµС€РЅРѕРіРѕ РІС…РѕРґР°")
-    public void testSuccessLogin(){
+    @DisplayName("Тестирование успешного входа")
+    @Description("Этот тест проверяет успешный вход пользователя в систему")
+    @Severity(SeverityLevel.CRITICAL)
+    @Story("Вход в систему")
+    public void testSuccessLogin() {
         given().header("Accept", "application/json").pathParam("username", createdUser.getUsername()).pathParam("password", createdUser.getPassword())
                 .when().get("/login?username={username}&password={password}")
                 .then().statusCode(200);
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ РЅРµСѓРґР°С‡РЅРѕРіРѕ РІС…РѕРґР°")
-    public void testFailedLogin(){
+    @DisplayName("Тестирование неудачного входа")
+    @Description("Этот тест проверяет неудачный вход с неверным паролем")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Неверный вход")
+    public void testFailedLogin() {
         given().header("Accept", "application/json").pathParam("username", createdUser.getUsername()).pathParam("password", 123123)
                 .when().get("/login?username={username}&password={password}")
                 .then().statusCode(200);
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓСЃРїРµС€РЅРѕРіРѕ РІС‹С…РѕРґ РёР· Р°РєРєР°СѓРЅС‚Р°")
-    public void testSuccessLogout(){
+    @DisplayName("Тестирование успешного выхода из аккаунта")
+    @Description("Этот тест проверяет успешный выход пользователя из аккаунта")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Выход из аккаунта")
+    public void testSuccessLogout() {
         given().header("Accept", "application/json")
                 .when().get("/logout")
                 .then().statusCode(200);
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓСЃРїРµС€РЅРѕРіРѕ РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testUpdateUser(){
+    @DisplayName("Тестирование успешного обновления пользователя")
+    @Description("Этот тест проверяет успешное обновление данных пользователя")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Обновление данных пользователя")
+    public void testUpdateUser() {
         UserSchema newUser = new UserSchema(1, "test1", "ilya", "butterfly", "jecki@mail.ru", "12345678", "89966666669", 0);
         given().header("Content-Type", "application/json").header("Accept", "application/json").pathParam("userName", createdUser.getUsername())
                 .body(newUser)
@@ -122,32 +139,38 @@ public class TestUserService {
                 .body("userStatus", equalTo(0));
     }
 
-
-
-
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓРґР°Р»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testSuccessDeleteUser(){
+    @DisplayName("Тестирование удаления пользователя")
+    @Description("Этот тест проверяет успешное удаление пользователя")
+    @Severity(SeverityLevel.CRITICAL)
+    @Story("Удаление пользователя")
+    public void testSuccessDeleteUser() {
         given().header("Accept", "application/json").pathParam("userName", createdUser.getUsername())
                 .when().delete("/{userName}")
                 .then().statusCode(200);
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓРґР°Р»РµРЅРёСЏ РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testFaildeDeleteUser(){
+    @DisplayName("Тестирование удаления несуществующего пользователя")
+    @Description("Этот тест проверяет попытку удалить несуществующего пользователя")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Удаление несуществующего пользователя")
+    public void testFailedDeleteUser() {
         given().header("Accept", "application/json").pathParam("userName", "not_Exits")
                 .when().delete("/{userName}")
                 .then().statusCode(404);
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№")
-    public void testSuccessCreateUsersWithArray(){
+    @DisplayName("Тестирование создания списка пользователей")
+    @Description("Этот тест проверяет создание списка пользователей")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Создание списка пользователей")
+    public void testSuccessCreateUsersWithArray() {
         List<UserSchema> users = new ArrayList<>();
-        users.add(new UserSchema(2, "test2", "Р”Р°СЂСЊСЏ", "РўРµСЃС‚РѕРІР°СЏ", "fir@mail.ru", "123441243", "89546563945", 1));
-        users.add(new UserSchema(3, "test3", "РќРёРєРёС‚Р°", "РњРёС…Р°Р№Р»РѕРІ", "test@yandex.com", "sd2ASe3sdffgb", "89678452134", 2));
-        users.add(new UserSchema(4, "test4", "РњР°РєСЃРёРј", "Р”РјРёС‚СЂРѕРІ", "jios@gmail.com", "*9df990erSf00-d", "89455382437", 0));
+        users.add(new UserSchema(2, "test2", "Дарья", "Тестовая", "fir@mail.ru", "123441243", "89546563945", 1));
+        users.add(new UserSchema(3, "test3", "Никита", "Михайлов", "test@yandex.com", "sd2ASe3sdffgb", "89678452134", 2));
+        users.add(new UserSchema(4, "test4", "Максим", "Дмитров", "jios@gmail.com", "*9df990erSf00-d", "89455382437", 0));
         given().header("Content-Type", "application/json").header("Accept", "application/json")
                 .body(users)
                 .when().post("/createWithArray")
@@ -155,12 +178,15 @@ public class TestUserService {
     }
 
     @Test
-    @DisplayName("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓРґР°Р»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
-    public void testSuccessCreateUsersWithList(){
+    @DisplayName("Тестирование создания списка пользователей")
+    @Description("Этот тест проверяет создание списка пользователей с использованием List")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Создание списка пользователей")
+    public void testSuccessCreateUsersWithList() {
         List<UserSchema> users = new ArrayList<>();
-        users.add(new UserSchema(2, "test2", "Р”Р°СЂСЊСЏ", "РўРµСЃС‚РѕРІР°СЏ", "fir@mail.ru", "123441243", "89546563945", 1));
-        users.add(new UserSchema(3, "test3", "РќРёРєРёС‚Р°", "РњРёС…Р°Р№Р»РѕРІ", "test@yandex.com", "sd2ASe3sdffgb", "89678452134", 2));
-        users.add(new UserSchema(4, "test4", "РњР°РєСЃРёРј", "Р”РјРёС‚СЂРѕРІ", "jios@gmail.com", "*9df990erSf00-d", "89455382437", 0));
+        users.add(new UserSchema(2, "test2", "Дарья", "Тестовая", "fir@mail.ru", "123441243", "89546563945", 1));
+        users.add(new UserSchema(3, "test3", "Никита", "Михайлов", "test@yandex.com", "sd2ASe3sdffgb", "89678452134", 2));
+        users.add(new UserSchema(4, "test4", "Максим", "Дмитров", "jios@gmail.com", "*9df990erSf00-d", "89455382437", 0));
         given().header("Content-Type", "application/json").header("Accept", "application/json")
                 .body(users)
                 .when().post("/createWithList")
