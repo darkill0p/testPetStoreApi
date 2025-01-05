@@ -1,4 +1,4 @@
-package users;
+package apiModels;
 
 public class UserSchema {
 
