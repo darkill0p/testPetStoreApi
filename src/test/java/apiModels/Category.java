@@ -1,22 +1,24 @@
 package apiModels;
 
+import java.util.Objects;
+
 public class Category {
-    private int id;
+    private Long id;
     private String name;
 
     public Category() {
     }
 
-    public Category(int id, String name) {
+    public Category(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -26,5 +28,22 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(id, category.id) &&
+                Objects.equals(name, category.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    public Category copy() {
+        return new Category(this.id, this.name);
     }
 }
