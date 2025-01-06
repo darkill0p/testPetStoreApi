@@ -52,6 +52,45 @@ public class TestStoreService {
     }
 
     @Test
+    @DisplayName("Тестировние создание заказа на питомца без данных")
+    @Description("Тестировние создание заказа на питомца без данных ")
+    @Step("Создание заказа на питомца")
+    public void testCreateOrderWithNoData(){
+        Order o = new Order();
+        given().header("Content-Type", "application/json").header("Accept", "application/json")
+                .body(o)
+                .log().ifValidationFails()
+                .when().post("/order")
+                .then().statusCode(200);
+    }
+
+    @Test
+    @DisplayName("Тестировние создание заказа на питомца без указанрия статуса")
+    @Description("Тестировние создание заказа на питомца без указанрия статуса")
+    @Step("Создание заказа на питомца")
+    public void testSuccessCreateOrdert(){
+        Order o = new Order(1, 21, 3, OffsetDateTime.now(), "", true);
+        given().header("Content-Type", "application/json").header("Accept", "application/json")
+                .body(o)
+                .log().ifValidationFails()
+                .when().post("/order")
+                .then().statusCode(200);
+    }
+
+    @Test
+    @DisplayName("Тестировние создание заказа на питомца без указания application/json")
+    @Description("Тестировние создание заказа на питомца без указания application/json")
+    @Step("Создание заказа на питомца")
+    public void testCreateOrderWithoutHeader(){
+        Order o = new Order(1, 21, 3, OffsetDateTime.now(), "placed", true);
+        given()
+                .body(o)
+                .log().ifValidationFails()
+                .when().post("/order")
+                .then().statusCode(415);
+    }
+
+    @Test
     @DisplayName("Тестировние получение заказа по id")
     @Description("Тестировние получение заказа по id")
     @Step("Получение заказа по id")
