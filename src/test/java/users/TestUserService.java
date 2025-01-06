@@ -26,7 +26,7 @@ public class TestUserService {
     @BeforeEach
     void createUser() {
         if (createdUser == null) {
-            createdUser = new UserSchema(1, "demon", "ivanov", "ivanovich", "ivanov@mail.ru", "12345678", "899999999999", 1);
+            createdUser = new UserSchema(1, "whiteUser", "ivanov", "ivanovich", "ivanov@mail.ru", "12345678", "899999999999", 1);
             given().header("Content-Type", "application/json").header("Accept", "application/json")
                     .body(createdUser)
                     .when().post()
@@ -48,6 +48,32 @@ public class TestUserService {
     }
 
     @Test
+    @DisplayName("“естирование  регистрации пользовател€ без указани€ header application/json")
+    @Description("Ётот тест провер€ет  регистрацию нового пользовател€ в системе")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("–егистраци€ нового пользовател€ без указани€ header application/json")
+    public void testSuccess1CreateUser() {
+        UserSchema user = new UserSchema(1, "dd1", "—ергеевич", "јнтонович", "ivanov@mail.ru", "12345678", "899999999999", 1);
+        given().body(user)
+                .when().post()
+                .then().statusCode(415);
+    }
+
+    @Test
+    @DisplayName("“естирование  регистрации пользовател€ без указани€ данных")
+    @Description("Ётот тест провер€ет  регистрацию нового пользовател€ в системе без указани€ данных")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("–егистраци€ нового пользовател€")
+    public void testCreateUserWithNullData() {
+        UserSchema user = new UserSchema();
+        given().header("Content-Type", "application/json").header("Accept", "application/json")
+                .body(user)
+                .when().post()
+                .then().statusCode(200);
+    }
+
+
+    @Test
     @DisplayName("“естирование успешного получени€ пользовател€")
     @Description("Ётот тест провер€ет успешное получение данных пользовател€")
     @Severity(SeverityLevel.CRITICAL)
@@ -56,7 +82,7 @@ public class TestUserService {
         int userId;
         Response response =
                 given().header("Content-Type", "application/json").pathParam("userName", createdUser.getUsername())
-                        .log().ifValidationFails() // Ћогировать только при провале теста
+                        .log().ifValidationFails()
                         .when().get("/{userName}")
                         .then()
                         .statusCode(200)
@@ -64,6 +90,8 @@ public class TestUserService {
         userId = response.jsonPath().getInt("id");
         Assertions.assertEquals(userId, 1, "User Id must be equal to 1");
     }
+
+
 
     @Test
     @DisplayName("“естирование получени€ несуществующего пользовател€")
@@ -178,6 +206,19 @@ public class TestUserService {
     }
 
     @Test
+    @DisplayName("“естирование создани€ списка из пустых пользователей пользователей")
+    @Description("Ётот тест провер€ет создание списка пользователей")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("—оздание списка из пустых пользователей")
+    public void testSCreateUsersWithNullArray() {
+        List<UserSchema> users = new ArrayList<>();
+        given().header("Content-Type", "application/json").header("Accept", "application/json")
+                .body(users)
+                .when().post("/createWithArray")
+                .then().statusCode(200);
+    }
+
+    @Test
     @DisplayName("“естирование создани€ списка пользователей")
     @Description("Ётот тест провер€ет создание списка пользователей с использованием List")
     @Severity(SeverityLevel.NORMAL)
@@ -187,6 +228,19 @@ public class TestUserService {
         users.add(new UserSchema(2, "test2", "ƒарь€", "“естова€", "fir@mail.ru", "123441243", "89546563945", 1));
         users.add(new UserSchema(3, "test3", "Ќикита", "ћихайлов", "test@yandex.com", "sd2ASe3sdffgb", "89678452134", 2));
         users.add(new UserSchema(4, "test4", "ћаксим", "ƒмитров", "jios@gmail.com", "*9df990erSf00-d", "89455382437", 0));
+        given().header("Content-Type", "application/json").header("Accept", "application/json")
+                .body(users)
+                .when().post("/createWithList")
+                .then().statusCode(200);
+    }
+
+    @Test
+    @DisplayName("“естирование создани€ списка пустых пользователей")
+    @Description("Ётот тест провер€ет создание списка пользователей с использованием List")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("—оздание списка пользователей")
+    public void testCreateUsersNullWithList() {
+        List<UserSchema> users = new ArrayList<>();
         given().header("Content-Type", "application/json").header("Accept", "application/json")
                 .body(users)
                 .when().post("/createWithList")
