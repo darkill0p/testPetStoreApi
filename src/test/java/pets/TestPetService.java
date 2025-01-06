@@ -154,6 +154,18 @@ public class TestPetService {
         }
     }
 
+    @DisplayName("Тестирование получение питомцев по статусам")
+    @Test
+    @Story("Получение питомцев")
+    @Step("Проверка питомцев со статусом {status}")
+    public void testSuccessGetPetsByStatuses(){
+        String status = "status=available&status=pending&status=sold";
+        Response response = given().header("Content-Type", "application/json").header("Accept", "application/json")
+                .when().get("/findByStatus?"+status)
+                .then().statusCode(200).extract().response();
+
+    }
+
     @DisplayName("Тестирование получение питомцев по несуществующему статусу")
     @Test
     @Step("Получение питомца по несуществующему статусу")

@@ -107,6 +107,21 @@ public class TestStoreService {
 
     }
 
+
+    @ParameterizedTest
+    @ValueSource(ints = {0,  11})
+    @DisplayName("“естировние получение заказа по id которые выход€т за гарницы >=1 и <=10")
+    @Description("“естировние получение заказа по id >=1 и <=10")
+    @Step("ѕолучение заказа по id id >=1 и <=10")
+    public void testGetOrderById(int num){
+        given().header("Accept", "application/json")
+                .when().get("/order/"+num)
+                .then().statusCode(400);
+
+
+
+    }
+
     @Test
     @DisplayName("“естировние получение заказа которого нет по id ")
     @Description("“естировние получение заказа по id")
