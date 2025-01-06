@@ -168,6 +168,20 @@ public class TestUserService {
     }
 
     @Test
+    @DisplayName("Тестирование успешного обновления пользователя")
+    @Description("Этот тест проверяет успешное обновление данных пользователя")
+    @Severity(SeverityLevel.NORMAL)
+    @Story("Обновление данных пользователя")
+    public void testUpdateUserWithNoData() {
+        UserSchema newUser = new UserSchema();
+        given().header("Content-Type", "application/json").header("Accept", "application/json").pathParam("userName", createdUser.getUsername())
+                .body(newUser)
+                .log().ifValidationFails()
+                .when().put("/{userName}")
+                .then().statusCode(200);
+    }
+
+    @Test
     @DisplayName("Тестирование удаления пользователя")
     @Description("Этот тест проверяет успешное удаление пользователя")
     @Severity(SeverityLevel.CRITICAL)
